@@ -144,7 +144,7 @@ function draw_theyyam_face(x, y, height) {
     let crown_top_circle_penta_gap = height * 0.1;
     t.goto(x - (crown_bottom_width / 2), y + crown_height);
     t.setheading(90);
-    t.fillcolor('#2E7D32'); // Emerald Green crown backing
+    t.fillcolor('#960018'); // Deep Red crown backing (updated from #2E7D32)
     t.begin_fill();
     t.circle(-crown_bottom_width / 2, 180);
     t.end_fill();
@@ -168,11 +168,11 @@ function draw_theyyam_face(x, y, height) {
         let chead = t.heading();
         t.setheading(0);
         let [cx, cy] = t.pos();
-        draw_pentagon(cx, cy, height * 0.082, false, '#EEA003'); // Golden Yellow
+        draw_pentagon(cx, cy, height * 0.082, false, '#F57C00'); // Orange (updated from #EEA003)
         t.setheading(chead);
         t.goto(cx, cy);
         t.setheading(0);
-        draw_pentagon(cx, cy, height * 0.053, false, '#F57C00'); // Vibrant Orange
+        draw_pentagon(cx, cy, height * 0.053, false, '#D84315'); // Dark Orange (updated from #F57C00)
         t.setheading(chead);
         t.goto(cx, cy);
         t.setheading(0);
@@ -214,7 +214,7 @@ function draw_theyyam_face(x, y, height) {
         t.circle(height * 0.2196 - height * 0.005, face_bottom_circle_ang / num_peaces);
         let [tx1, ty1] = t.pos();
         let chead_inner = t.heading();
-        draw_dual_circle(tx1, ty1, crad, crad / 2.3, '#EEA003', height * 0.003);
+        draw_dual_circle(tx1, ty1, crad, crad / 2.3, '#F57C00', height * 0.003);
         t.setheading(chead_inner);
         t.goto(tx1, ty1);
     }
@@ -257,7 +257,7 @@ function draw_theyyam_face(x, y, height) {
         t.setheading(dec_tmp_head1);
         let num_dots_inner = 20;
         for (let j = 0; j < num_dots_inner; j++) {
-            t.dot(height * 0.02, '#EEA003');
+            t.dot(height * 0.02, '#F57C00');
             t.circle(-top_band_radius, top_band_angle / num_dots_inner);
         }
     }
@@ -273,7 +273,7 @@ function draw_theyyam_face(x, y, height) {
     t.setheading(90);
     t.forward(height * 0.054);
     t.setheading(0);
-    t.fillcolor('#FBC02D'); // Golden Yellow inner
+    t.fillcolor('#F57C00'); // Orange inner (updated from #FBC02D)
     t.begin_fill();
     t.circle(band_side_circle_rad - height * 0.054);
     t.end_fill();
@@ -296,7 +296,7 @@ function draw_theyyam_face(x, y, height) {
     t.setheading(90);
     t.forward(height * 0.054);
     t.setheading(0);
-    t.fillcolor('#FBC02D'); // Golden Yellow inner
+    t.fillcolor('#F57C00'); // Orange inner (updated from #FBC02D)
     t.begin_fill();
     t.circle(band_side_circle_rad - height * 0.054);
     t.end_fill();
@@ -445,7 +445,7 @@ function draw_theyyam_face(x, y, height) {
     t.left(90);
     t.forward(height * 0.067);
     t.right(90);
-    t.fillcolor('#EEA003'); // Golden Yellow accent
+    t.fillcolor('#F57C00'); // Orange accent (updated from #EEA003)
     t.begin_fill();
     t.circle(-(height * 0.1 + height * 0.067), angle_top_circles);
     let chead_fore_outer = t.heading();
@@ -518,6 +518,51 @@ function colored_star(x, y, size = 40, fillclr = null, angle = 120, pen_down = f
     }
     t.goto(x, y);
     t.setheading(chead);
+}
+
+function draw_double_diamond(x, y, size) {
+    let chead = t.heading();
+    t.penup();
+    t.goto(x, y);
+    
+    // Draw outer diamond (white outline)
+    t.right(90);
+    t.forward(size);
+    t.left(135);
+    t.color('#FFFFFF');
+    t.pensize(2.0);
+    t.pendown();
+    
+    let side = Math.sqrt(2) * size;
+    for (let i = 0; i < 4; i++) {
+        t.forward(side);
+        t.left(90);
+    }
+    t.penup();
+    
+    // Go back to center
+    t.goto(x, y);
+    t.setheading(chead);
+    
+    // Draw inner diamond (fully filled white)
+    let inner_size = size * 0.45;
+    t.right(90);
+    t.forward(inner_size);
+    t.left(135);
+    t.fillcolor('#FFFFFF');
+    t.begin_fill();
+    let inner_side = Math.sqrt(2) * inner_size;
+    for (let i = 0; i < 4; i++) {
+        t.forward(inner_side);
+        t.left(90);
+    }
+    t.end_fill();
+    
+    // Go back to center
+    t.penup();
+    t.goto(x, y);
+    t.setheading(chead);
+    t.pensize(1); // reset
 }
 
 function draw_flower_design(x, y, rad) {
@@ -615,7 +660,7 @@ function draw_theyyam(x, y, width) {
     t.goto(x - width / 2, y);
     t.left(90);
     t.forward(len_square_bottom + non_circle_len);
-    t.fillcolor('#0D5218'); // Outermost crown arch: Forest Green
+    t.fillcolor('#B22222'); // Outermost crown arch: Red (updated to #B22222)
     t.begin_fill();
     t.circle(-len_half_circle, 180);
     t.end_fill();
@@ -631,21 +676,21 @@ function draw_theyyam(x, y, width) {
     
     t.setheading(90);
     t.goto(x - width / 2 + half_circle_gap * 2, y + (len_square_bottom + non_circle_len));
-    t.fillcolor('#F57C00'); // Third arch: Orange
+    t.fillcolor('#D84315'); // Third arch: Dark Orange (updated from #F57C00)
     t.begin_fill();
     t.circle(-len_half_circle + half_circle_gap * 2, 180);
     t.end_fill();
     
     t.setheading(90);
     t.goto(x - width * 0.27, y + (len_square_bottom + non_circle_len));
-    t.fillcolor('#EEA003'); // Fourth arch: Yellow
+    t.fillcolor('#F57C00'); // Fourth arch: Orange (updated from #EEA003)
     t.begin_fill();
     t.circle(-width * 0.27, 180);
     t.end_fill();
     
     t.setheading(90);
     t.goto(x - width * 0.21, y + (len_square_bottom + non_circle_len));
-    t.fillcolor('#0D5218'); // Fifth arch: Forest Green
+    t.fillcolor('#960018'); // Fifth arch: Deep Red (updated from #0D5218)
     t.begin_fill();
     t.circle(-width * 0.21, 180);
     t.end_fill();
@@ -685,7 +730,7 @@ function draw_theyyam(x, y, width) {
     for (let i = 0; i < num_stars - 1; i++) {
         t.circle(-len_half_circle + (half_circle_gap * 1.5), 180 / num_stars);
         let [cx, cy] = t.pos();
-        colored_star(cx, cy, width * 0.01, '#FFFFFF');
+        draw_double_diamond(cx, cy, width * 0.018);
     }
     
     let center_no_circle_rad = width * 0.19;
@@ -717,8 +762,8 @@ function draw_theyyam(x, y, width) {
     }
     
     // Draw the square below the big half circle (horizontal bar)
-    draw_square(x, y + non_circle_len, width, len_square_bottom, 0, '#EEA003', true, 0);
-    draw_square(x, y + non_circle_len + (width * 0.024), width - (width * 0.015), len_square_bottom - 2 * (width * 0.024), 0, '#0D5218', true, 0);
+    draw_square(x, y + non_circle_len, width, len_square_bottom, 0, '#F57C00', true, 0); // Orange border (updated from #EEA003)
+    draw_square(x, y + non_circle_len + (width * 0.024), width - (width * 0.015), len_square_bottom - 2 * (width * 0.024), 0, '#960018', true, 0); // Deep Red inner (updated from #0D5218)
     
     // decoration
     t.setheading(0);
@@ -741,13 +786,13 @@ function draw_theyyam(x, y, width) {
     for (let i = 0; i < num_peaces_bottom; i++) {
         t.forward(wi_btm / num_peaces_bottom / 2);
         t.dot(width * 0.028, '#7E0908');
-        t.dot(width * 0.01, '#EEA003');
+        t.dot(width * 0.01, '#F57C00');
         t.setheading(270);
         t.forward(width * 0.031);
         let num = 20;
         t.setheading(0);
         for (let j = 0; j < num; j++) {
-            t.dot(width * 0.005, '#EEA003');
+            t.dot(width * 0.005, '#F57C00');
             t.circle(width * 0.031, 360 / num);
         }
         t.setheading(90);
@@ -867,11 +912,11 @@ function draw_theyyam(x, y, width) {
     t.circle(val_for_cir / 2 - width * 0.09);
     t.end_fill();
     
-    // Side white/silver rectangular plates
-    draw_square(x, y + non_circle_len + (len_square_bottom / 2), bottom_len, len_square_bottom / 2, 0, '#DDD4B6', true, 0);
-    draw_square(x, y + non_circle_len + (len_square_bottom / 2) + (width * 0.01), bottom_len - (width * 0.036 * 1), len_square_bottom / 2 - (width * 0.01), 0, '#DDD4B6', true, 0);
-    draw_square(x, y + non_circle_len + (len_square_bottom / 2) + (width * 0.01 * 2), bottom_len - (width * 0.036 * 2), len_square_bottom / 2 - (width * 0.01 * 2), 0, '#F3EBD7', true, 0);
-    draw_square(x, y + non_circle_len + (len_square_bottom / 2) + (width * 0.01 * 3), bottom_len - (width * 0.036 * 3), len_square_bottom / 2 - (width * 0.01 * 3), 0, '#FFFFFF', true, 0);
+    // Side red rectangular plates (updated from white/silver)
+    draw_square(x, y + non_circle_len + (len_square_bottom / 2), bottom_len, len_square_bottom / 2, 0, '#8B1E24', true, 0);
+    draw_square(x, y + non_circle_len + (len_square_bottom / 2) + (width * 0.01), bottom_len - (width * 0.036 * 1), len_square_bottom / 2 - (width * 0.01), 0, '#960018', true, 0);
+    draw_square(x, y + non_circle_len + (len_square_bottom / 2) + (width * 0.01 * 2), bottom_len - (width * 0.036 * 2), len_square_bottom / 2 - (width * 0.01 * 2), 0, '#B22222', true, 0);
+    draw_square(x, y + non_circle_len + (len_square_bottom / 2) + (width * 0.01 * 3), bottom_len - (width * 0.036 * 3), len_square_bottom / 2 - (width * 0.01 * 3), 0, '#D32F2F', true, 0);
     
     // Draw the shape at the bottom, which looks like a thaadi
     let r = bottom_len / 2;
