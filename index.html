@@ -6,6 +6,9 @@
   <title>Code A Pookalam</title>
   <meta name="description" content="Traditional Indian floral design (Pookalam) created with code, inspired by theyyam art.">
   <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -31,11 +34,51 @@
   </div>
 
   <!-- Main content -->
-  <div class="canvas-container" id="mainContent">
-    <canvas id="pookalamCanvas"></canvas>
-    <!-- Overlay canvas for the spin-lock animation of the green ring -->
-    <canvas id="animCanvas"></canvas>
+  <div class="scene">
+    <svg class="annotation-lines" viewBox="0 0 1200 900" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <marker id="cartoon-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M 2 2 Q 5 5 8 5 Q 5 5 2 8" fill="none" stroke="#2d4d22" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" />
+        </marker>
+      </defs>
+
+      <!-- Left Top: Vibrant Onam Colors -->
+      <path d="M 200 140 Q 260 170 322 217" fill="none" stroke="#2d4d22" stroke-width="3.5" stroke-linecap="round" marker-end="url(#cartoon-arrow)"/>
+      
+      <!-- Left Mid: Traditional Pookalam Design -->
+      <path d="M 195 350 Q 228 345 261 350" fill="none" stroke="#2d4d22" stroke-width="3.5" stroke-linecap="round" marker-end="url(#cartoon-arrow)"/>
+      
+      <!-- Left Bottom: Symmetrical & Balanced Patterns -->
+      <path d="M 200 680 Q 260 700 322 683" fill="none" stroke="#2d4d22" stroke-width="3.5" stroke-linecap="round" marker-end="url(#cartoon-arrow)"/>
+
+      <!-- Right Top: Eyes move with your cursor (pointing just outside the Pookalam) -->
+      <path d="M 1000 140 Q 940 160 878 217" fill="none" stroke="#2d4d22" stroke-width="3.5" stroke-linecap="round" marker-end="url(#cartoon-arrow)"/>
+      
+      <!-- Right Mid: Intricate Floral & Geometric Details -->
+      <path d="M 1000 330 Q 966 320 932 330" fill="none" stroke="#2d4d22" stroke-width="3.5" stroke-linecap="round" marker-end="url(#cartoon-arrow)"/>
+      
+      <!-- Right Bottom: Perfect blend of Tradition & Creativity -->
+      <path d="M 1000 680 Q 940 700 878 683" fill="none" stroke="#2d4d22" stroke-width="3.5" stroke-linecap="round" marker-end="url(#cartoon-arrow)"/>
+    </svg>
+
+    <div class="note note-left-top">Vibrant<br>Onam Colors</div>
+    <div class="note note-left-mid">Traditional<br>Pookalam Design</div>
+    <div class="note note-left-bottom">Symmetrical<br>&amp; Balanced<br>Patterns</div>
+
+    <div class="note note-right-top">Eyes move<br>with your<br>cursor</div>
+    <div class="note note-right-mid">Intricate<br>Floral &amp;<br>Geometric<br>Details</div>
+    <div class="note note-right-bottom">Perfect blend<br>of Tradition<br>&amp; Creativity</div>
+
+    <div class="canvas-container" id="mainContent">
+      <canvas id="pookalamCanvas"></canvas>
+      <!-- Overlay canvas for the spin-lock animation of the green ring -->
+      <canvas id="animCanvas"></canvas>
+    </div>
   </div>
+
+  <footer class="footer-credit">
+    Made by Ebin Reji for Code a Pookalam using HTML, CSS, and JS. No images were used for the entire development.
+  </footer>
 
   <script src="turtle.js"></script>
   <script src="pookalam.js"></script>

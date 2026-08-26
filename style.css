@@ -14,6 +14,45 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+.scene {
+  position: relative;
+  width: min(1200px, 98vw);
+  height: min(920px, 98vh);
+}
+
+.annotation-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.note {
+  position: absolute;
+  z-index: 3;
+  font-family: "Caveat", cursive;
+  font-size: clamp(2.1rem, 2.5vw, 4rem);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  color: rgba(20, 20, 20, 0.9);
+  font-weight: 500;
+  text-align: center;
+  transform: rotate(-2deg);
+  white-space: nowrap;
+}
+
+.note-left-top { left: 1%; top: 12%; }
+.note-left-mid { left: -3.5%; top: 34%; }
+.note-left-bottom { left: 1%; top: 72%; }
+
+.note-right-top { right: 1%; top: 12%; }
+.note-right-mid { right: 0.5%; top: 30%; }
+.note-right-bottom { right: 1%; top: 72%; }
+
+/* #mainContent styling handled in .canvas-container */
+
 /* ── Preloader ─────────────────────────────────────────── */
 #preloader {
   position: fixed;
@@ -116,20 +155,22 @@ body {
 
 /* ── Canvas container ──────────────────────────────────── */
 .canvas-container {
-  position: relative; /* needed for animCanvas absolute positioning */
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 98%;
+  aspect-ratio: 1 / 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 90vmin;
-  height: 90vmin;
   opacity: 0;
-  transform: scale(0.97);
+  transform: translate(-50%, -50%) scale(0.97);
   transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
 }
 
 .canvas-container.visible {
   opacity: 1;
-  transform: scale(1);
+  transform: translate(-50%, -50%) scale(1);
 }
 
 canvas {
@@ -148,4 +189,28 @@ canvas {
   opacity: 0;
   transform-origin: 50% 50%;
   pointer-events: none;
+}
+
+/* ── Footer Credit ────────────────────────────────────── */
+.footer-credit {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-size: 12px;
+  color: #555555;
+  font-family: inherit;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+  opacity: 0.85;
+}
+
+@media (max-width: 600px) {
+  .footer-credit {
+    font-size: 10px;
+    white-space: normal;
+    text-align: center;
+    width: 90%;
+  }
 }
