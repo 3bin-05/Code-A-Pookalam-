@@ -153,7 +153,6 @@ body {
   text-align: center;
 }
 
-/* ── Canvas container ──────────────────────────────────── */
 .canvas-container {
   position: absolute;
   left: 50%;
@@ -166,11 +165,27 @@ body {
   opacity: 0;
   transform: translate(-50%, -50%) scale(0.97);
   transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+  z-index: 1;
 }
 
 .canvas-container.visible {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
+}
+
+.bg-text {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%) rotate(-6deg);
+  font-family: 'Caveat', cursive;
+  font-size: clamp(14rem, 28vw, 32rem);
+  font-weight: 700;
+  color: rgba(220, 160, 40, 0.08); /* Translucent warm gold/tan */
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  white-space: nowrap;
 }
 
 canvas {

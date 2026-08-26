@@ -69,6 +69,8 @@
     <div class="note note-right-mid">Intricate<br>Floral &amp;<br>Geometric<br>Details</div>
     <div class="note note-right-bottom">Perfect blend<br>of Tradition<br>&amp; Creativity</div>
 
+    <div class="bg-text">Pookalam</div>
+
     <div class="canvas-container" id="mainContent">
       <canvas id="pookalamCanvas"></canvas>
       <!-- Overlay canvas for the spin-lock animation of the green ring -->
@@ -118,8 +120,8 @@
       setTimeout(() => {
         document.getElementById('preloader').classList.add('slide-up');
         document.getElementById('mainContent').classList.add('visible');
-        // Trigger the green ring spin-lock after the preloader slides away
-        setTimeout(startGreenRingSpin, 400);
+        // Trigger the triangle ring spin-lock after the preloader slides away
+        setTimeout(startTriangleRingSpin, 400);
       }, 500);
     }
 
@@ -139,8 +141,8 @@
     setTimeout(() => {
       if (!pookalamDone) dismissPreloader();
     }, 8000);
-    // ── Green ring spin-lock animation ───────────────────────
-    function startGreenRingSpin() {
+    // ── Triangle ring spin-lock animation ─────────────────────
+    function startTriangleRingSpin() {
       const src   = document.getElementById('pookalamCanvas');
       const anim  = document.getElementById('animCanvas');
       const W = src.width, H = src.height;
@@ -150,11 +152,11 @@
       const ctx = anim.getContext('2d');
       const cx = W / 2, cy = H / 2;
 
-      // Ring geometry (matches pookalam.js)
-      const R_OUTER = 264 * (W / 750);
-      const R_INNER = 220 * (W / 750); // slightly inside inner boundary
+      // Ring geometry (matches draw_triangle_ring in pookalam.js)
+      const R_OUTER = 229 * (W / 750);
+      const R_INNER = 185 * (W / 750);
 
-      // Grab pixels of the green ring from the static canvas
+      // Grab pixels of the triangle ring from the static canvas
       const offscreen = document.createElement('canvas');
       offscreen.width = W; offscreen.height = H;
       const offCtx = offscreen.getContext('2d');
@@ -164,7 +166,7 @@
       ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, R_OUTER + 4, 0, 2 * Math.PI);
-      ctx.arc(cx, cy, R_INNER, 0, 2 * Math.PI, true); // inner hole
+      ctx.arc(cx, cy, R_INNER - 2, 0, 2 * Math.PI, true); // inner hole with safety padding
       ctx.clip('evenodd');
       ctx.drawImage(offscreen, 0, 0);
       ctx.restore();
