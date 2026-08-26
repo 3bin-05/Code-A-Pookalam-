@@ -1,0 +1,151 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ── Preloader ─────────────────────────────────────────── */
+#preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+#preloader.slide-up {
+  transform: translateY(-100%);
+}
+
+.preloader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Flower Loader */
+.flower-spinner {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flower-core {
+  width: 22px;
+  height: 22px;
+  background-color: #F57C00; /* Orange core */
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 0 10px rgba(245, 124, 0, 0.4);
+}
+
+.flower-petal-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  animation: spinFlower 6s linear infinite;
+  z-index: 1;
+}
+
+.flower-petal {
+  position: absolute;
+  width: 14px;
+  height: 30px;
+  background-color: #FBC02D; /* Yellow petals */
+  border-radius: 50% 50% 20% 20%;
+  top: 10px;
+  left: 33px; /* centered horizontally: (80/2 - 14/2) = 33px */
+  transform-origin: center 30px; /* bottom-ish pivot center */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  transform: rotate(var(--rot));
+  animation: petalPulse 1.6s ease-in-out infinite alternate;
+}
+
+.flower-petal:nth-child(1) { --rot: 0deg; animation-delay: 0s; }
+.flower-petal:nth-child(2) { --rot: 45deg; animation-delay: 0.2s; }
+.flower-petal:nth-child(3) { --rot: 90deg; animation-delay: 0.4s; }
+.flower-petal:nth-child(4) { --rot: 135deg; animation-delay: 0.6s; }
+.flower-petal:nth-child(5) { --rot: 180deg; animation-delay: 0.8s; }
+.flower-petal:nth-child(6) { --rot: 225deg; animation-delay: 1s; }
+.flower-petal:nth-child(7) { --rot: 270deg; animation-delay: 1.2s; }
+.flower-petal:nth-child(8) { --rot: 315deg; animation-delay: 1.4s; }
+
+@keyframes spinFlower {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes petalPulse {
+  0% {
+    transform: rotate(var(--rot)) scale(0.9);
+  }
+  100% {
+    transform: rotate(var(--rot)) scale(1.12);
+  }
+}
+
+
+/* Loading message text */
+.loading-text {
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: #000000;
+  font-weight: 400;
+  opacity: 1;
+  transition: opacity 0.2s ease;
+  text-align: center;
+}
+
+/* ── Canvas container ──────────────────────────────────── */
+.canvas-container {
+  position: relative; /* needed for animCanvas absolute positioning */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 90vmin;
+  height: 90vmin;
+  opacity: 0;
+  transform: scale(0.97);
+  transition: opacity 0.6s ease 0.1s, transform 0.6s ease 0.1s;
+}
+
+.canvas-container.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Green ring spin-lock overlay canvas ───────────────── */
+#animCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transform-origin: 50% 50%;
+  pointer-events: none;
+}

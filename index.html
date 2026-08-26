@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code A Pookalam</title>
+  <meta name="description" content="Traditional Indian floral design (Pookalam) created with code, inspired by theyyam art.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Preloader overlay -->
+  <div id="preloader">
+    <div class="preloader-inner">
+      <!-- Flower Loader -->
+      <div class="flower-spinner">
+        <div class="flower-core"></div>
+        <div class="flower-petal-container">
+          <div class="flower-petal"></div>
+          <div class="flower-petal"></div>
+          <div class="flower-petal"></div>
+          <div class="flower-petal"></div>
+          <div class="flower-petal"></div>
+          <div class="flower-petal"></div>
+          <div class="flower-petal"></div>
+          <div class="flower-petal"></div>
+        </div>
+      </div>
+      <p id="loading-message" class="loading-text">Gathering flowers…</p>
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div class="canvas-container" id="mainContent">
+    <canvas id="pookalamCanvas"></canvas>
+    <!-- Overlay canvas for the spin-lock animation of the green ring -->
+    <canvas id="animCanvas"></canvas>
+  </div>
+
+  <script src="turtle.js"></script>
+  <script src="pookalam.js"></script>
+
+  <script>
+    const msgEl = document.getElementById('loading-message');
+
+    // Timed dialogue sequence spread across 6 seconds
+    // Each entry: [delay_ms, text]
+    const dialogues = [
+      [0,    "Gathering flowers…"],
+      [750,  "Spinning up the Pookalam…"],
+      [1500, "Arranging petals by hand…"],
+      [2250, "Invoking Theyyam spirits…"],
+      [3000, "Counting marigolds…"],
+      [3750, "Drawing ancient patterns…"],
+      [4500, "Blessing the courtyard…"],
+      [5200, "Almost there…"],
+    ];
+
+    function showMsg(text) {
+      msgEl.style.opacity = '0';
+      setTimeout(() => {
+        msgEl.textContent = text;
+        msgEl.style.opacity = '1';
+      }, 200);
+    }
+
+    // Schedule each dialogue
+    dialogues.forEach(([delay, text]) => {
+      setTimeout(() => showMsg(text), delay);
+    });
+
+    function dismissPreloader() {
+      // Flash "Ready!"
+      showMsg("✦ Ready ✦");
+      setTimeout(() => {
+        document.getElementById('preloader').classList.add('slide-up');
+        document.getElementById('mainContent').classList.add('visible');
+        // Trigger the green ring spin-lock after the preloader slides away
+        setTimeout(startGreenRingSpin, 400);
+      }, 500);
+    }
+
+    // Always wait the full 6 seconds before dismissing
+    let pookalamDone = false;
+    const MIN_DURATION = 6000;
+    const startTime = Date.now();
+
+    window.onPookalamReady = function () {
+      pookalamDone = true;
+      const elapsed = Date.now() - startTime;
+      const remaining = Math.max(0, MIN_DURATION - elapsed);
+      setTimeout(dismissPreloader, remaining);
+    };
+
+    // Safety fallback: dismiss after 8s even if onPookalamReady never fires
+    setTimeout(() => {
+      if (!pookalamDone) dismissPreloader();
+    }, 8000);
+    // ── Green ring spin-lock animation ───────────────────────
+    function startGreenRingSpin() {
+      const src   = document.getElementById('pookalamCanvas');
+      const anim  = document.getElementById('animCanvas');
+      const W = src.width, H = src.height;
+      anim.width  = W;
+      anim.height = H;
+
+      const ctx = anim.getContext('2d');
+      const cx = W / 2, cy = H / 2;
+
+      // Ring geometry (matches pookalam.js)
+      const R_OUTER = 264 * (W / 750);
+      const R_INNER = 220 * (W / 750); // slightly inside inner boundary
+
+      // Grab pixels of the green ring from the static canvas
+      const offscreen = document.createElement('canvas');
+      offscreen.width = W; offscreen.height = H;
+      const offCtx = offscreen.getContext('2d');
+      offCtx.drawImage(src, 0, 0);
+
+      // Stamp the overlay with ONLY the ring region using a clipping donut
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(cx, cy, R_OUTER + 4, 0, 2 * Math.PI);
+      ctx.arc(cx, cy, R_INNER, 0, 2 * Math.PI, true); // inner hole
+      ctx.clip('evenodd');
+      ctx.drawImage(offscreen, 0, 0);
+      ctx.restore();
+
+      // Reveal the overlay
+      anim.style.opacity = '1';
+
+      // Spring ease: starts at 360° → 0° with slight overshoot
+      const DURATION = 1400; // ms
+      const startTime = performance.now();
+
+      function springEase(t) {
+        // Exponential decay with one overshoot
+        return 1 - Math.pow(2, -8 * t) * Math.cos(18 * t);
+      }
+
+      function frame(now) {
+        const t = Math.min((now - startTime) / DURATION, 1);
+        const easedT = springEase(t);
+        const deg = 360 * (1 - easedT); // 360 → 0
+
+        anim.style.transform = `rotate(${deg}deg)`;
+
+        if (t < 1) {
+          requestAnimationFrame(frame);
+        } else {
+          // Locked in — fade out overlay (main canvas shows through)
+          anim.style.transition = 'opacity 0.35s ease';
+          anim.style.opacity = '0';
+        }
+      }
+
+      requestAnimationFrame(frame);
+    }
+  </script>
+</body>
+</html>
