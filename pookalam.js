@@ -1,3 +1,13 @@
+/**
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * ✦ Thirunayan Pookalam ✦
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ * Developed with ♥ by : Ebin Reji
+ * Project             : Code a Pookalam (Theyyam Art Inspired Traditional Floral Design)
+ * Technologies        : HTML5 Canvas, Vanilla CSS, Native JavaScript
+ * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ */
+
 window.eyeData = {
     leftPupilCenter: null,
     rightPupilCenter: null,
@@ -1338,6 +1348,7 @@ function drawPupils(mx, my) {
 }
 
 window.onload = function() {
+    // Main drawing entry point - Created by Ebin Reji
     const canvas = document.getElementById('pookalamCanvas');
     canvas.width = 750;
     canvas.height = 750;
