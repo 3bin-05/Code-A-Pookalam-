@@ -206,13 +206,56 @@ canvas {
   pointer-events: none;
 }
 
-/* ── Footer Credit ────────────────────────────────────── */
-.footer-credit {
+/* ── Footer Container ─────────────────────────────────── */
+.footer-container {
   position: fixed;
-  bottom: 12px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+  width: 90%;
+  max-width: 600px;
+  pointer-events: none;
+}
+
+.footer-container * {
+  pointer-events: auto;
+}
+
+.pookalam-title {
+  font-family: 'Caveat', cursive;
+  font-size: 40px; /* Font size of 40 as requested */
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin: 0;
+  padding: 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  user-select: none;
+}
+
+.pookalam-title span {
+  display: inline-block;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.pookalam-title span:hover {
+  transform: translateY(-2px) scale(1.15);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+}
+
+/* Colorful theme matching the Pookalam colors (repeating sequence) */
+.pookalam-title span:nth-child(5n+1) { color: #D32F2F; } /* Radiant Crimson Red */
+.pookalam-title span:nth-child(5n+2) { color: #F57C00; } /* Vibrant Orange */
+.pookalam-title span:nth-child(5n+3) { color: #EEA003; } /* Golden Yellow */
+.pookalam-title span:nth-child(5n+4) { color: #2E7D32; } /* Emerald Green */
+.pookalam-title span:nth-child(5n+5) { color: #8B1E24; } /* Deep Maroon */
+
+.footer-credit {
   font-size: 12px;
   color: #555555;
   font-family: inherit;
@@ -225,7 +268,5 @@ canvas {
   .footer-credit {
     font-size: 10px;
     white-space: normal;
-    text-align: center;
-    width: 90%;
   }
 }
