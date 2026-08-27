@@ -981,6 +981,10 @@ function draw_triangle_ring(rad, band_width = 55, num_peaces = 28) {
     
     let colors_inward = ['#0D5218', '#F57C00', '#EEA003', '#7E0908'];
     let colors_outward = ['#7E0908', '#0D5218', '#F57C00', '#EEA003'];
+    if (window.pookalamTheme && window.pookalamTheme.current === 'marigold_theyyam') {
+        colors_inward = ['#0D5218', '#8B1E24', '#EEA003', '#7E0908'];
+        colors_outward = ['#7E0908', '#0D5218', '#8B1E24', '#EEA003'];
+    }
     
     // 1. Background dark green foundation ring
     t.penup();
@@ -1084,7 +1088,7 @@ function draw_designed_scallop(t, sc_cx, sc_cy, theta, rad_len) {
     t.penup();
     t.goto(sc_cx, sc_cy - (rad_len - 3.5));
     t.setheading(0);
-    t.fillcolor('#F57C00');
+    t.fillcolor(window.pookalamTheme && window.pookalamTheme.current === 'marigold_theyyam' ? '#0D5218' : '#F57C00');
     t.begin_fill();
     t.circle(rad_len - 3.5);
     t.end_fill();
@@ -1335,13 +1339,15 @@ function reset_position(x = 0, y = 0) {
     t.goto(x, y);
 }
 
-function drawPupils(mx, my) {
+function drawPupils(mx, my, customCtx) {
     const canvas = document.getElementById('pookalamCanvas');
-    const ctx = canvas.getContext('2d');
+    const ctx = customCtx || canvas.getContext('2d');
     
-    // Clear the visible canvas and redraw the pre-rendered static parts
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(staticCanvas, 0, 0);
+    // If drawing without a custom context, we follow original behavior of clearing/drawing staticCanvas
+    if (!customCtx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(staticCanvas, 0, 0);
+    }
     
     // Safety check: prevent calling drawPupils before window.eyeData is initialized
     if (!window.eyeData || !window.eyeData.leftPupilCenter) return;
@@ -1392,125 +1398,247 @@ function drawPupils(mx, my) {
     }
 }
 
-window.onload = function() {
+window.initPookalam = function() {
     // Main drawing entry point - Created by Ebin Reji
     const canvas = document.getElementById('pookalamCanvas');
     canvas.width = 750;
     canvas.height = 750;
     
-    // Create static offscreen canvas to pre-render the static pookalam elements
-    staticCanvas = document.createElement('canvas');
-    staticCanvas.width = 750;
-    staticCanvas.height = 750;
-    
-    // Initialize our turtle targeting the static canvas
-    window.t = new CanvasTurtle(staticCanvas);
-    
-    // Set line join and cap styles for smooth drawing
-    t.ctx.lineCap = 'round';
-    t.ctx.lineJoin = 'round';
-    
-    const rad = 300;
-    t.penup();
-    reset_position(0, -rad);
-    const [x, y] = t.pos();
-    
-    // 1. Outermost Scallop Ring — exactly matching Python original
-    const circular_width = 30;
-    const cut_threshold = 1.3;
-    const colors2 = ['#8B1E24', '#F57C00', '#FBC02D', '#FFFFFF'];
-    
-    const occ_circular = draw_circular(
-        rad,
-        circular_width,
-        4,
-        colors2,
-        Math.floor((rad * Math.PI * 2) / (circular_width * cut_threshold)),
-        false
-    );
-    
-    reset_position(0, y + occ_circular);
-    
-    const padding_circle = 5;
-    t.fillcolor('#0D5218');
-    t.begin_fill();
-    t.circle(rad - occ_circular + 2.5);
-    t.end_fill();
-    
-    // Draw outer white outline at the border edge
-    reset_position(0, -(rad - occ_circular + 2.5));
-    t.color('#FFFFFF');
-    t.pensize(2.5);
-    t.pendown();
-    t.circle(rad - occ_circular + 2.5);
-    t.penup();
-    
-    const new_rad = rad - occ_circular - padding_circle;
-    
-    // 2. Second Outer Layer: Series of Interlocking Triangles
-    const triangle_band_width = 44;
-    const num_triangles = 28;
-    const occ_triangle = draw_triangle_ring(new_rad, triangle_band_width, num_triangles);
-    
-    const inner_rad = new_rad - occ_triangle;
-    
-    // Draw the green border circle between the triangles and the Theyyam area
-    reset_position(0, -inner_rad);
-    t.fillcolor('#0D5218');
-    t.begin_fill();
-    t.circle(inner_rad);
-    t.end_fill();
-    
-    const face_padding = 5;
-    const inner_rad_face = inner_rad - face_padding;
-    
-    reset_position(0, -inner_rad_face);
-    t.fillcolor('#F3EBD7');
-    t.begin_fill();
-    t.circle(inner_rad_face);
-    t.end_fill();
-    
-    // Draw inner white outline at the border edge
-    reset_position(0, -inner_rad_face);
-    t.color('#FFFFFF');
-    t.pensize(2.5);
-    t.pendown();
-    t.circle(inner_rad_face);
-    t.penup();
-    
-    const num_spokes = 15;
-    const angle_step = 360 / (num_spokes * 2);
-    const spoke_colors = ['#F3EBD7', '#DDD4B6'];
-    for (let i = 0; i < num_spokes * 2; i++) {
-        const clr = spoke_colors[i % spoke_colors.length];
+    // Declare layer canvases so they are in closure scope for drawing and rendering
+    const baseCanvas = document.createElement('canvas');
+    baseCanvas.width = 750;
+    baseCanvas.height = 750;
+
+    const triangleCanvas = document.createElement('canvas');
+    triangleCanvas.width = 750;
+    triangleCanvas.height = 750;
+
+    const outerCanvas = document.createElement('canvas');
+    outerCanvas.width = 750;
+    outerCanvas.height = 750;
+
+    window.drawPookalamLayers = function() {
+        // Create static offscreen canvas to pre-render the static pookalam elements
+        staticCanvas = document.createElement('canvas');
+        staticCanvas.width = 750;
+        staticCanvas.height = 750;
+        
+        // Initialize our turtle targeting the static canvas
+        window.t = new CanvasTurtle(staticCanvas);
+        
+        // Set line join and cap styles for smooth drawing
+        t.ctx.lineCap = 'round';
+        t.ctx.lineJoin = 'round';
+        
+        const rad = 300;
         t.penup();
-        t.goto(0, -inner_rad_face);
-        t.setheading(0);
-        t.circle(inner_rad_face, i * angle_step);
-        const [cx1, cy1] = t.pos();
-        t.fillcolor(clr);
+        reset_position(0, -rad);
+        const [x, y] = t.pos();
+        
+        // 1. Outermost Scallop Ring — exactly matching Python original
+        const circular_width = 30;
+        const cut_threshold = 1.3;
+        const colors2 = ['#8B1E24', '#F57C00', '#FBC02D', '#FFFFFF'];
+        
+        const occ_circular = draw_circular(
+            rad,
+            circular_width,
+            4,
+            colors2,
+            Math.floor((rad * Math.PI * 2) / (circular_width * cut_threshold)),
+            false
+        );
+        
+        reset_position(0, y + occ_circular);
+        
+        const padding_circle = 5;
+        t.fillcolor('#0D5218');
         t.begin_fill();
-        t.circle(inner_rad_face, angle_step);
-        t.goto(0, 0);
-        t.goto(cx1, cy1);
+        t.circle(rad - occ_circular + 2.5);
         t.end_fill();
-    }
-    
-    draw_theyyam(0, rad * 0.08, inner_rad_face * 1.75);
-    
-    // Set up mouse interaction across the entire window
+        
+        // Draw outer white outline at the border edge
+        reset_position(0, -(rad - occ_circular + 2.5));
+        t.color('#FFFFFF');
+        t.pensize(2.5);
+        t.pendown();
+        t.circle(rad - occ_circular + 2.5);
+        t.penup();
+        
+        const new_rad = rad - occ_circular - padding_circle;
+        
+        // 2. Second Outer Layer: Series of Interlocking Triangles
+        const triangle_band_width = 44;
+        const num_triangles = 28;
+        const occ_triangle = draw_triangle_ring(new_rad, triangle_band_width, num_triangles);
+        
+        const inner_rad = new_rad - occ_triangle;
+        
+        // Draw the green border circle between the triangles and the Theyyam area
+        reset_position(0, -inner_rad);
+        t.fillcolor('#0D5218');
+        t.begin_fill();
+        t.circle(inner_rad);
+        t.end_fill();
+        
+        const face_padding = 5;
+        const inner_rad_face = inner_rad - face_padding;
+        
+        reset_position(0, -inner_rad_face);
+        t.fillcolor('#F3EBD7');
+        t.begin_fill();
+        t.circle(inner_rad_face);
+        t.end_fill();
+        
+        // Draw inner white outline at the border edge
+        reset_position(0, -inner_rad_face);
+        t.color('#FFFFFF');
+        t.pensize(2.5);
+        t.pendown();
+        t.circle(inner_rad_face);
+        t.penup();
+        
+        const num_spokes = 15;
+        const angle_step = 360 / (num_spokes * 2);
+        const spoke_colors = ['#F3EBD7', '#DDD4B6'];
+        for (let i = 0; i < num_spokes * 2; i++) {
+            const clr = spoke_colors[i % spoke_colors.length];
+            t.penup();
+            t.goto(0, -inner_rad_face);
+            t.setheading(0);
+            t.circle(inner_rad_face, i * angle_step);
+            const [cx1, cy1] = t.pos();
+            t.fillcolor(clr);
+            t.begin_fill();
+            t.circle(inner_rad_face, angle_step);
+            t.goto(0, 0);
+            t.goto(cx1, cy1);
+            t.end_fill();
+        }
+        
+        // Scale theyyam to fit the inner circle (radius 180) perfectly as a half circle
+        const theyyamWidth = inner_rad_face * 2.0;
+        const theyyamHeight = (theyyamWidth * 0.20) + (theyyamWidth * 0.137) + (theyyamWidth * 0.5);
+        const theyyamYOffset = (theyyamWidth * 0.5) - (theyyamHeight / 2);
+        draw_theyyam(0, theyyamYOffset, theyyamWidth);
+        
+        // Clear and draw base offscreen canvas
+        const ctxBase = baseCanvas.getContext('2d');
+        ctxBase.clearRect(0, 0, 750, 750);
+        ctxBase.drawImage(staticCanvas, 0, 0);
+
+        // Clear the triangle ring region on baseCanvas (radius 184 to 230)
+        ctxBase.globalCompositeOperation = 'destination-out';
+        ctxBase.beginPath();
+        ctxBase.arc(375, 375, 230, 0, 2 * Math.PI);
+        ctxBase.arc(375, 375, 184, 0, 2 * Math.PI, true);
+        ctxBase.fill();
+
+        // Clear the outer scallop ring region on baseCanvas (radius 233 to 305)
+        ctxBase.beginPath();
+        ctxBase.arc(375, 375, 305, 0, 2 * Math.PI);
+        ctxBase.arc(375, 375, 233, 0, 2 * Math.PI, true);
+        ctxBase.fill();
+
+        // Reset composite operation
+        ctxBase.globalCompositeOperation = 'source-over';
+
+        // Clear and draw triangle offscreen canvas (radius 183 to 231)
+        const ctxTri = triangleCanvas.getContext('2d');
+        ctxTri.clearRect(0, 0, 750, 750);
+        ctxTri.save();
+        ctxTri.beginPath();
+        ctxTri.arc(375, 375, 231, 0, 2 * Math.PI);
+        ctxTri.arc(375, 375, 183, 0, 2 * Math.PI, true);
+        ctxTri.clip('evenodd');
+        ctxTri.drawImage(staticCanvas, 0, 0);
+        ctxTri.restore();
+
+        // Clear and draw outer offscreen canvas (radius 233 to 305)
+        const ctxOuter = outerCanvas.getContext('2d');
+        ctxOuter.clearRect(0, 0, 750, 750);
+        ctxOuter.save();
+        ctxOuter.beginPath();
+        ctxOuter.arc(375, 375, 305, 0, 2 * Math.PI);
+        ctxOuter.arc(375, 375, 233, 0, 2 * Math.PI, true);
+        ctxOuter.clip('evenodd');
+        ctxOuter.drawImage(staticCanvas, 0, 0);
+        ctxOuter.restore();
+    };
+
+    // Draw initially
+    window.drawPookalamLayers();
+
+    // Rotation angles
+    let triangleAngle = 0;
+    let outerAngle = 0;
+    let isHovered = canvas.matches(':hover');
+
+    // Slow-paced speeds (one clockwise, one anticlockwise)
+    const triangleSpeed = -0.0015; // anticlockwise, slow
+    const outerSpeed = 0.0015;      // clockwise, slow
+
+    let mouseX = undefined;
+    let mouseY = undefined;
+
+    // Track mouse movement globally for eye tracking
     window.addEventListener('mousemove', function(e) {
         const rect = canvas.getBoundingClientRect();
-        const mx = ((e.clientX - rect.left) / rect.width) * canvas.width;
-        const my = ((e.clientY - rect.top) / rect.height) * canvas.height;
-        drawPupils(mx, my);
+        mouseX = ((e.clientX - rect.left) / rect.width) * canvas.width;
+        mouseY = ((e.clientY - rect.top) / rect.height) * canvas.height;
     });
-    
-    // Initial draw to render default centered eyes
-    drawPupils();
-    
-    // Notify the preloader that everything is rendered
+
+    // Detect hover state on the canvas container to pause/resume rotations
+    canvas.addEventListener('mouseenter', function() {
+        isHovered = true;
+    });
+
+    canvas.addEventListener('mouseleave', function() {
+        isHovered = false;
+    });
+
+    // Render loop
+    const mainCtx = canvas.getContext('2d');
+    function render() {
+        if (!isHovered) {
+            triangleAngle += triangleSpeed;
+            outerAngle += outerSpeed;
+        }
+
+        // Clear main canvas
+        mainCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // 1. Draw static base layer
+        mainCtx.drawImage(baseCanvas, 0, 0);
+
+        // 2. Draw rotated triangle layer
+        mainCtx.save();
+        mainCtx.translate(375, 375);
+        mainCtx.rotate(triangleAngle);
+        mainCtx.translate(-375, -375);
+        mainCtx.drawImage(triangleCanvas, 0, 0);
+        mainCtx.restore();
+
+        // 3. Draw rotated outer layer
+        mainCtx.save();
+        mainCtx.translate(375, 375);
+        mainCtx.rotate(outerAngle);
+        mainCtx.translate(-375, -375);
+        mainCtx.drawImage(outerCanvas, 0, 0);
+        mainCtx.restore();
+
+        // 4. Draw pupils interactive layers on top
+        drawPupils(mouseX, mouseY, mainCtx);
+
+        requestAnimationFrame(render);
+    }
+
+    // Start the animation render loop
+    render();
+
+    // Notify the preloader that everything is rendered and the loop has started
     if (typeof window.onPookalamReady === 'function') {
         window.onPookalamReady();
     }
 };
+window.initPookalam();

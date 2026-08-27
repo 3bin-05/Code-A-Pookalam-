@@ -12,6 +12,33 @@ class CanvasTurtle {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     
+    // Intercept CanvasRenderingContext2D fillStyle and strokeStyle sets
+    const originalSetFill = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'fillStyle').set;
+    const originalGetFill = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'fillStyle').get;
+    Object.defineProperty(this.ctx, 'fillStyle', {
+      get() {
+        return originalGetFill.call(this);
+      },
+      set(val) {
+        const resolved = window.getThemeColor ? window.getThemeColor(val) : val;
+        originalSetFill.call(this, resolved);
+      },
+      configurable: true
+    });
+
+    const originalSetStroke = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'strokeStyle').set;
+    const originalGetStroke = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, 'strokeStyle').get;
+    Object.defineProperty(this.ctx, 'strokeStyle', {
+      get() {
+        return originalGetStroke.call(this);
+      },
+      set(val) {
+        const resolved = window.getThemeColor ? window.getThemeColor(val) : val;
+        originalSetStroke.call(this, resolved);
+      },
+      configurable: true
+    });
+    
     // Turtle state
     this.x = 0;
     this.y = 0;
@@ -101,16 +128,18 @@ class CanvasTurtle {
   }
   
   color(strokeColor, fillColor = null) {
-    this.strokeColor = strokeColor;
+    const resolve = (c) => window.getThemeColor ? window.getThemeColor(c) : c;
+    this.strokeColor = resolve(strokeColor);
     if (fillColor !== null) {
-      this.fillColor = fillColor;
+      this.fillColor = resolve(fillColor);
     } else {
-      this.fillColor = strokeColor;
+      this.fillColor = resolve(strokeColor);
     }
   }
   
   fillcolor(colorStr) {
-    this.fillColor = colorStr;
+    const resolve = (c) => window.getThemeColor ? window.getThemeColor(c) : c;
+    this.fillColor = resolve(colorStr);
   }
   
   pensize(size) {
@@ -140,10 +169,11 @@ class CanvasTurtle {
   }
   
   dot(size, colorStr) {
+    const resolve = (c) => window.getThemeColor ? window.getThemeColor(c) : c;
     const p = this.toCanvasCoords(this.x, this.y);
     this.ctx.beginPath();
     this.ctx.arc(p.x, p.y, size / 2, 0, 2 * Math.PI);
-    this.ctx.fillStyle = colorStr || this.fillColor;
+    this.ctx.fillStyle = resolve(colorStr) || this.fillColor;
     this.ctx.fill();
   }
   
